@@ -41,7 +41,11 @@
 			<Add library="deps/steamworks_sdk_142/sdk/public/steam/lib/win64/libsdkencryptedappticket64.a" />
 			<Add library="deps/steamworks_sdk_142/sdk/redistributable_bin/win64/libsteam_api64.a" />
 		</Linker>
+		<Unit filename="auth.cpp" />
+		<Unit filename="auth.hpp" />
+		<Unit filename="deps/networking/serialisable.cpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="serialisable_fwd.hpp" />
 		<Unit filename="steam_api.cpp" />
 		<Unit filename="steam_api.hpp" />
 		<Unit filename="steam_auth.cpp" />
