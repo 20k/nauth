@@ -12,8 +12,6 @@ struct steamapi
     bool enabled = false;
     bool overlay_open = false;
 
-    uint64_t steamapicall = 0;
-
     steamapi();
     ~steamapi();
 
