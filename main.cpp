@@ -9,7 +9,7 @@
 
 void auth_tests()
 {
-    set_db_location("./test");
+    set_db_location("./db");
     set_num_dbs(1);
 
     db_backend& db = get_db();
@@ -53,6 +53,9 @@ void auth_tests()
 
 void server()
 {
+    set_db_location("./db");
+    set_num_dbs(1);
+
     std::string secret_key = "secret/akey.ect";
     uint64_t net_code_appid = 814820;
 
@@ -70,6 +73,8 @@ void server()
             conn.pop_new_client();
         }
 
+        ///so connection needs to understand whether or not someone is authed?
+        ///or should auth go somewhere else?
         while(conn.has_read())
         {
             network_protocol proto;
@@ -80,11 +85,27 @@ void server()
             {
                 std::string hex = proto.data;
 
-                std::optional<steam_auth_data> auth = get_steam_auth(hex);
+                std::optional<steam_auth_data> steam_auth = get_steam_auth(hex);
 
-                if(auth)
+                if(steam_auth)
                 {
-                    std::cout << "auth with " << auth.value().steam_id << std::endl;
+                    std::cout << "auth with " << steam_auth.value().steam_id << std::endl;
+
+                    auth<int> user_auth;
+
+                    db_read_write tx(get_db(), 0);
+
+                    if(user_auth.load(std::to_string(steam_auth.value().steam_id), tx))
+                    {
+                        std::cout << "Returning user\n";
+                    }
+                    else
+                    {
+                        std::cout << "New user\n";
+
+                        user_auth.key = std::to_string(steam_auth.value().steam_id);
+                        user_auth.save(tx);
+                    }
                 }
             }
 
