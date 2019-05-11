@@ -9,6 +9,7 @@
 
 void auth_tests()
 {
+    ///this api is horrible
     set_db_location("./db");
     set_num_dbs(1);
 
