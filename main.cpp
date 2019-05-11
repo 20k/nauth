@@ -131,7 +131,6 @@ void client()
     proto.type = network_mode::STEAM_AUTH;
     proto.data = binary_to_hex(str, false);
 
-
     conn.writes_to(proto, -1);
 
     printf("Done!\n");
