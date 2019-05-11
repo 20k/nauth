@@ -88,33 +88,7 @@ void server()
             {
                 std::string hex = proto.data;
 
-                std::optional<steam_auth_data> steam_auth = get_steam_auth(hex);
-
-                if(steam_auth)
-                {
-                    std::cout << "auth with " << steam_auth.value().steam_id << std::endl;
-
-                    auth<int> user_auth;
-
-                    db_read_write tx(get_db(), 0);
-
-                    if(user_auth.load(std::to_string(steam_auth.value().steam_id), tx))
-                    {
-                        std::cout << "Returning user\n";
-                    }
-                    else
-                    {
-                        std::cout << "New user\n";
-
-                        user_auth.key = std::to_string(steam_auth.value().steam_id);
-                        user_auth.user_id = std::to_string(steam_auth.value().steam_id);
-                        user_auth.type = auth_type::STEAM;
-
-                        user_auth.save(tx);
-                    }
-
-                    auths.make_authenticated(client_id, user_auth);
-                }
+                auths.handle_steam_auth(client_id, hex, get_db());
             }
 
             if(!auths.authenticated(client_id))
@@ -160,7 +134,7 @@ void client()
 
     conn.writes_to(proto, -1);
 
-    printf("Done!");
+    printf("Done!\n");
 
     while(1){}
 }
