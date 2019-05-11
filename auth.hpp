@@ -66,7 +66,7 @@ struct auth_manager
         {
             std::cout << "auth with " << steam_auth.value().steam_id << std::endl;
 
-            auth<int> user_auth;
+            auth<T> user_auth;
 
             db_read_write tx(db, AUTH_DB_ID);
 
