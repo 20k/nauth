@@ -82,7 +82,7 @@ void server()
 
             auto client_id = conn.reads_from(proto);
 
-            if(proto.type == network_mode::AUTH)
+            if(proto.type == network_mode::STEAM_AUTH)
             {
                 std::string hex = proto.data;
 
@@ -141,7 +141,7 @@ void client()
     std::string str(vec.begin(), vec.end());
 
     network_protocol proto;
-    proto.type = network_mode::AUTH;
+    proto.type = network_mode::STEAM_AUTH;
     proto.data = binary_to_hex(str, false);
 
 
