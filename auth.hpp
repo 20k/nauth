@@ -15,7 +15,7 @@ namespace auth_type
 }
 
 template<typename user_data>
-struct auth : serialisable
+struct auth : serialisable, db_storable<auth<user_data>>
 {
     user_data data;
 
