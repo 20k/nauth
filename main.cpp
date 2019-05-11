@@ -1,7 +1,11 @@
 #include <iostream>
 #include <networking/serialisable.hpp>
+#include <networking/networking.hpp>
 #include <ndb/db_storage.hpp>
 #include "auth.hpp"
+#include "steam_auth.hpp"
+#include "steam_api.hpp"
+#include <windows.h>
 
 void auth_tests()
 {
@@ -47,9 +51,92 @@ void auth_tests()
     }
 }
 
+void server()
+{
+    std::string secret_key = "secret/akey.ect";
+    uint64_t net_code_appid = 814820;
+
+    set_app_description({secret_key, net_code_appid});
+
+    connection conn;
+    conn.host("127.0.0.1", 6750);
+
+    while(1)
+    {
+        while(conn.has_new_client())
+        {
+            printf("Nu client!\n");
+
+            conn.pop_new_client();
+        }
+
+        while(conn.has_read())
+        {
+            network_protocol proto;
+
+            auto client_id = conn.reads_from(proto);
+
+            if(proto.type == network_mode::AUTH)
+            {
+                std::string hex = proto.data;
+
+                std::optional<steam_auth_data> auth = get_steam_auth(hex);
+
+                if(auth)
+                {
+                    std::cout << "auth with " << auth.value().steam_id << std::endl;
+                }
+            }
+
+            if(proto.type == network_mode::DATA)
+            {
+
+            }
+
+            conn.pop_read(client_id);
+        }
+
+        Sleep(1);
+    }
+}
+
+void client()
+{
+    steamapi api;
+
+    connection conn;
+    conn.connect("127.0.0.1", 6750);
+
+    api.request_auth_token("");
+
+    while(!api.auth_success())
+    {
+        api.pump_callbacks();
+    }
+
+    std::vector<uint8_t> vec = api.get_encrypted_token();
+
+    std::string str(vec.begin(), vec.end());
+
+    network_protocol proto;
+    proto.type = network_mode::AUTH;
+    proto.data = binary_to_hex(str, false);
+
+
+    conn.writes_to(proto, -1);
+
+    printf("Done!");
+
+    while(1){}
+}
+
 int main()
 {
     auth_tests();
+
+    std::thread(server).detach();
+
+    client();
 
     return 0;
 }

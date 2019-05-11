@@ -15,7 +15,7 @@ struct steamapi
     steamapi();
     ~steamapi();
 
-    void handle_auth(const std::string& user_data);
+    void request_auth_token(const std::string& user_data);
     bool auth_success();
     void pump_callbacks();
     bool is_overlay_open();

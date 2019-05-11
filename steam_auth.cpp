@@ -6,15 +6,6 @@
 #include <chrono>
 #include <iostream>
 
-size_t get_time_ms()
-{
-    size_t milliseconds_since_epoch =
-    std::chrono::duration_cast<std::chrono::milliseconds>
-        (std::chrono::system_clock::now().time_since_epoch()).count();
-
-    return milliseconds_since_epoch;
-}
-
 int char_to_val(uint8_t c)
 {
     if(c >= '0' && c <= '9')
@@ -23,12 +14,33 @@ int char_to_val(uint8_t c)
     uint8_t low = tolower(c);
 
     if(low >= 'a' && low <= 'f')
-        return low - 'a';
+        return (low - 'a') + 10;
 
     return 0;
 }
 
-inline
+std::string binary_to_hex(const std::string& in, bool swap_endianness)
+{
+    std::string ret;
+
+    const char* LUT = "0123456789ABCDEF";
+
+    for(auto& i : in)
+    {
+        int lower_bits = ((int)i) & 0xF;
+        int upper_bits = (((int)i) >> 4) & 0xF;
+
+        if(swap_endianness)
+        {
+            std::swap(lower_bits, upper_bits);
+        }
+
+        ret += std::string(1, LUT[lower_bits]) + std::string(1, LUT[upper_bits]);
+    }
+
+    return ret;
+}
+
 std::string hex_to_binary(const std::string& in, bool swap_endianness)
 {
     std::string ret;
@@ -59,6 +71,15 @@ std::string hex_to_binary(const std::string& in, bool swap_endianness)
     }
 
     return ret;
+}
+
+size_t get_time_ms()
+{
+    size_t milliseconds_since_epoch =
+    std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::system_clock::now().time_since_epoch()).count();
+
+    return milliseconds_since_epoch;
 }
 
 inline

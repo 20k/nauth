@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <string>
 
+std::string binary_to_hex(const std::string& in, bool swap_endianness);
+std::string hex_to_binary(const std::string& in, bool swap_endianness);
+
 struct app_description
 {
     std::string secret_key_location;

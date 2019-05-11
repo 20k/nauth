@@ -94,7 +94,7 @@ void steamapi::pump_callbacks()
     SteamAPI_RunCallbacks();
 }
 
-void steamapi::handle_auth(const std::string& user_data)
+void steamapi::request_auth_token(const std::string& user_data)
 {
     if(!enabled)
         return;
@@ -119,7 +119,6 @@ bool steamapi::auth_success()
         return false;
 
     std::lock_guard guard(secret_environment->lock);
-    printf("Inside function\n");
 
     if(secret_environment->auth_in_progress)
         return false;
