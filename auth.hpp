@@ -2,6 +2,8 @@
 #define AUTH_HPP_INCLUDED
 
 #include <networking/serialisable.hpp>
+#include <map>
+#include <mutex>
 
 namespace auth_type
 {
@@ -29,6 +31,28 @@ struct auth : serialisable, db_storable<auth<user_data>>
         DO_SERIALISE(data);
         DO_SERIALISE(user_id);
         DO_SERIALISE(type);
+    }
+};
+
+template<typename T>
+struct auth_manager
+{
+    std::map<uint64_t, auth<T>> auths;
+    std::mutex mut;
+
+    [[nodiscard]]
+    bool authenticated(uint64_t id)
+    {
+        std::lock_guard guard(mut);
+
+        return auths.find(id) != auths.end();
+    }
+
+    void make_authenticated(uint64_t id, const auth<T>& in)
+    {
+        std::lock_guard guard(mut);
+
+        auths[id] = in;
     }
 };
 

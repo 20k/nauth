@@ -65,6 +65,8 @@ void server()
     connection conn;
     conn.host("127.0.0.1", 6750);
 
+    auth_manager<int> auths;
+
     while(1)
     {
         while(conn.has_new_client())
@@ -105,9 +107,20 @@ void server()
                         std::cout << "New user\n";
 
                         user_auth.key = std::to_string(steam_auth.value().steam_id);
+                        user_auth.user_id = std::to_string(steam_auth.value().steam_id);
+                        user_auth.type = auth_type::STEAM;
+
                         user_auth.save(tx);
                     }
+
+                    auths.make_authenticated(client_id, user_auth);
                 }
+            }
+
+            if(!auths.authenticated(client_id))
+            {
+                conn.pop_read(client_id);
+                continue;
             }
 
             if(proto.type == network_mode::DATA)
