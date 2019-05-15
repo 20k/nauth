@@ -28,12 +28,14 @@ struct auth : serialisable, db_storable<auth<user_data>>
     std::string user_id;
 
     auth_type::type type = auth_type::NONE;
+    bool authenticated = false;
 
     SERIALISE_SIGNATURE()
     {
         DO_SERIALISE(data);
         DO_SERIALISE(user_id);
         DO_SERIALISE(type);
+        DO_SERIALISE(authenticated);
     }
 };
 
@@ -58,10 +60,12 @@ struct auth_manager
     {
         std::lock_guard guard(mut);
 
-        return auths.find(id) != auths.end();
+        auto it = auths.find(id);
+
+        return it != auths.end() && it->second.authenticated;
     }
 
-    void make_authenticated(uint64_t id, const auth<T>& in)
+    void set_user_auth(uint64_t id, const auth<T>& in)
     {
         std::lock_guard guard(mut);
 
@@ -95,13 +99,14 @@ struct auth_manager
                 user_auth.key = std::to_string(steam_auth.value().steam_id);
                 user_auth.user_id = std::to_string(steam_auth.value().steam_id);
                 user_auth.type = auth_type::STEAM;
+                user_auth.authenticated = true;
 
                 user_auth.save(tx);
 
                 type = auth_state::NEW;
             }
 
-            make_authenticated(id, user_auth);
+            set_user_auth(id, user_auth);
         }
 
         return type;
