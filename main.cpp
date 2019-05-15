@@ -93,6 +93,8 @@ void server()
 
             if(!auths.authenticated(client_id))
             {
+                printf("DENIED\n");
+
                 conn.pop_read(client_id);
                 continue;
             }
