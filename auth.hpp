@@ -37,6 +37,16 @@ struct auth : serialisable, db_storable<auth<user_data>>
     }
 };
 
+namespace auth_state
+{
+    enum type : uint32_t
+    {
+        NEW,
+        EXISTING,
+        INVALID,
+    };
+}
+
 template<typename T>
 struct auth_manager
 {
@@ -58,9 +68,11 @@ struct auth_manager
         auths[id] = in;
     }
 
-    void handle_steam_auth(uint64_t id, const std::string& hex, const db_backend& db)
+    auth_state::type handle_steam_auth(uint64_t id, const std::string& hex, const db_backend& db)
     {
         std::optional<steam_auth_data> steam_auth = get_steam_auth(hex);
+
+        auth_state::type type = auth_state::INVALID;
 
         if(steam_auth)
         {
@@ -73,6 +85,8 @@ struct auth_manager
             if(user_auth.load(std::to_string(steam_auth.value().steam_id), tx))
             {
                 std::cout << "Returning user\n";
+
+                type = auth_state::EXISTING;
             }
             else
             {
@@ -83,10 +97,26 @@ struct auth_manager
                 user_auth.type = auth_type::STEAM;
 
                 user_auth.save(tx);
+
+                type = auth_state::NEW;
             }
 
             make_authenticated(id, user_auth);
         }
+
+        return type;
+    }
+
+    std::optional<auth<T>*> fetch(uint64_t id)
+    {
+        std::lock_guard guard(mut);
+
+        auto it = auths.find(id);
+
+        if(it == auths.end())
+            return std::nullopt;
+
+        return &it->second;
     }
 };
 
