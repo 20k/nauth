@@ -48,6 +48,8 @@
 		<Unit filename="auth.hpp" />
 		<Unit filename="deps/ndb/db_storage.cpp" />
 		<Unit filename="deps/ndb/db_storage.hpp" />
+		<Unit filename="deps/networking/networking.cpp" />
+		<Unit filename="deps/networking/networking.hpp" />
 		<Unit filename="deps/networking/serialisable.cpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="serialisable_fwd.hpp" />
