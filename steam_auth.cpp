@@ -73,6 +73,9 @@ std::string hex_to_binary(const std::string& in, bool swap_endianness)
     return ret;
 }
 
+namespace
+{
+
 size_t get_time_ms()
 {
     size_t milliseconds_since_epoch =
@@ -93,6 +96,7 @@ std::string read_file_bin(const std::string& file)
         throw std::runtime_error("Could not open file " + file);
 
     return str;
+}
 }
 
 app_description& get_app_description()
