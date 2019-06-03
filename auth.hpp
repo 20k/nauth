@@ -5,6 +5,7 @@
 #include <map>
 #include <mutex>
 #include "steam_auth.hpp"
+#include <iostream>
 
 #define AUTH_DB_ID 0
 
