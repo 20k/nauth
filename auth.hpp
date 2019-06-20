@@ -31,7 +31,7 @@ struct auth : serialisable, db_storable<auth<user_data>>
     auth_type::type type = auth_type::NONE;
     bool authenticated = false;
 
-    SERIALISE_SIGNATURE()
+    SERIALISE_SIGNATURE(auth<user_data>)
     {
         DO_SERIALISE(data);
         DO_SERIALISE(user_id);
